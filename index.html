@@ -65,13 +65,14 @@
         // Tu link de MediaMTX saliendo por DuckDNS
         var streamURL = "https://almost-senate-devourer.ngrok-free.dev/mistra/index.m3u8";
 
-        if (Hls.isSupported()) {
-            var hls = new Hls();
-            hls.loadSource(streamURL);
-            hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                video.play();
-            });
+       if (Hls.isSupported()) {
+        var hls = new Hls({
+            xhrSetup: function(xhr, url) {
+                xhr.setRequestHeader('ngrok-skip-browser-warning', 'true');
+            }
+        });
+        hls.loadSource(streamURL);
+        hls.attachMedia(video);
         } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
             // Soporte para Safari o iOS
             video.src = streamURL;
