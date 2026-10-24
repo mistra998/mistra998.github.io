@@ -173,22 +173,23 @@
     var streamURL = atob("aHR0cHM6Ly9taXN0cmE5OTguZHVja2Rucy5vcmcvY25sYmc5LmlzY25sYjlnOTBlbXNiR1ZLV052bkJoYVc1bGNpbmJqZzlwbmpiRzlaZFhYSlRtTm9jRW1hVzVrZ3ViTN1B==");
 
     var player = new Clappr.Player({
-        source: streamURL,
-        parentId: "#Clappr-Player",
-        width: "100%",
-        height: "100%",
-        autoPlay: true,
-        mute: false,
-        mediacontrol: {seekbar: "#8a2be2", buttons: "#fff"},
-        hlsConfig: {
-            maxBufferLength: 60,           // Acumula hasta 60 segundos de video en caché
-            maxMaxBufferLength: 120,       // Límite máximo de búfer
-            liveSyncDurationCount: 5,      // Establece un pequeño delay de seguridad contra tirones
-            liveMaxLatencyDurationCount: 15,
-            lowLatencyMode: false,         // Desactiva la baja latencia forzada para priorizar fluidez
-            enableWorker: true
-        }
-    });
+            source: streamURL,
+            parentId: "#clappr-player",
+            width: "100%",
+            height: "100%",
+            autoPlay: true,
+            mute: true, // 
+            mimeType: "application/x-mpegURL", // 
+            mediacontrol: {seekbar: "#8a2be2", buttons: "#fff"},
+            hlsConfig: {
+                maxBufferLength: 60,
+                maxMaxBufferLength: 120,
+                liveSyncDurationCount: 5,
+                liveMaxLatencyDurationCount: 15,
+                lowLatencyMode: false,
+                enableWorker: true
+            }
+        });
 </script>
             document.addEventListener('visibilitychange', function() {
             if (!document.hidden) {
