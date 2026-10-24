@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stream en Vivo - Mistra998</title>
     <style>
         /* Usamos flexbox en el body para dividir la pantalla */
@@ -85,15 +86,11 @@
         var streamURL = "https://deadline-minority-cover-licence.trycloudflare.com/mistra/index.m3u8";
 
        if (Hls.isSupported()) {
-     var hls = new Hls();
-     hls.loadSource(streamURL);
-        hls.loadSource(streamURL);
-        hls.attachMedia(video);
-        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            // Soporte para Safari o iOS
-            video.src = streamURL;
-            video.addEventListener('loadedmetadata', function() {
-                video.play();
+     var hls = new Hls({
+        liveSyncDurationCount: 2,       // Arranca lo más cerca posible del vivo
+        liveMaxLatencyDurationCount: 4, // Si se atrasa mucho, salta automáticamente al vivo
+        maxLiveSyncPlaybackRate: 1.5    // Si se atrasa un poquito, acelera el video sutilmente para alcanzar el vivo sin cortes
+    });
             });
         }
     </script>
