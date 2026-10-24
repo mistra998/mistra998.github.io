@@ -78,21 +78,30 @@
         <iframe src="https://www.twitch.tv/embed/mistra887/chat?parent=mistra998.github.io" frameborder="0"></iframe>
     </div>
 
-    <!-- SCRIPT ORIGINAL DEL REPRODUCTOR -->
+
+        <!-- SCRIPT ORIGINAL DEL REPRODUCTOR -->
     <script>
         var video = document.getElementById('video');
         
-        // Tu link de MediaMTX saliendo por DuckDNS
+        // Tu link de MediaMTX saliendo por Cloudflare
         var streamURL = "https://deadline-minority-cover-licence.trycloudflare.com/mistra/index.m3u8";
 
-       if (Hls.isSupported()) {
-     var hls = new Hls({
-        liveSyncDurationCount: 2,       // Arranca lo más cerca posible del vivo
-        liveMaxLatencyDurationCount: 4, // Si se atrasa mucho, salta automáticamente al vivo
-        maxLiveSyncPlaybackRate: 1,8    // Si se atrasa un poquito, acelera el video sutilmente para alcanzar el vivo sin cortes
-    });
+        if (Hls.isSupported()) {
+            var hls = new Hls({
+                liveSyncDurationCount: 4,       
+                liveMaxLatencyDurationCount: 10, 
+                maxLiveSyncPlaybackRate: 1.2    
+            });
+            hls.loadSource(streamURL);
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                video.play();
+            });
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            // Soporte para Safari o iOS
+            video.src = streamURL;
+            video.addEventListener('loadedmetadata', function() {
+                video.play();
             });
         }
     </script>
-</body>
-</html>
