@@ -70,7 +70,7 @@
 
     <!-- CAJA DEL VIDEO -->
     <div class="video-container">
-        <video id="video" controls autoplay muted></video>
+        <video id="video" controls autoplay muted playsinline></video>
     </div>
 
     <!-- CAJA DEL CHAT -->
@@ -87,9 +87,9 @@
 
        if (Hls.isSupported()) {
      var hls = new Hls({
-        liveSyncDurationCount: 4,       // Arranca lo más cerca posible del vivo
-        liveMaxLatencyDurationCount: 10, // Si se atrasa mucho, salta automáticamente al vivo
-        maxLiveSyncPlaybackRate: 1.2    // Si se atrasa un poquito, acelera el video sutilmente para alcanzar el vivo sin cortes
+        liveSyncDurationCount: 2,       // Arranca lo más cerca posible del vivo
+        liveMaxLatencyDurationCount: 4, // Si se atrasa mucho, salta automáticamente al vivo
+        maxLiveSyncPlaybackRate: 1,8    // Si se atrasa un poquito, acelera el video sutilmente para alcanzar el vivo sin cortes
     });
             });
         }
