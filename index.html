@@ -146,21 +146,17 @@
     </style>
 </head>
 <body>
+    
 
-    <!-- BARRA SUPERIOR -->
-    <div class="top-bar">
-        <img src="logo.png" alt="Mistra998">
+<!-- CONTENEDOR DE VIDEO Y CHAT -->
+<div class="main-container">
+    <div class="video-container">
+        <div id="clappr-player"></div>
     </div>
-
-    <!-- CONTENEDOR DE VIDEO Y CHAT -->
-    <div class="main-container">
-        <div class="video-container">
-            <video id="mistra-player" controls autoplay playsinline muted></video>
-        </div>
-        <div class="chat-container">
-            <iframe src="https://www.twitch.tv/embed/mistra887/chat?parent=mistra998.github.io&darkpopout"></iframe>
-        </div>
+    <div class="chat-container">
+        <iframe src="https://www.twitch.tv/embed/mistrass7/chat?parent=mistra998.github.io&darkpopout"></iframe>
     </div>
+</div>
 
     <!-- BARRA SUPERIOR -->
 <div class="top-bar">
@@ -171,28 +167,29 @@
     <button id="theater-btn">Modo Teatro</button>
 </div>
 
-    <!-- SCRIPT DE HLS.JS (Directo, sin tirones y ultrarrápido) -->
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <script>
-        var video = document.getElementById('mistra-player');
-        var streamURL = atob("aHR0cHM6Ly9nbm9tZS1ldmFsdWF0ZS1jb250cm9sbGVkLWNvbnRhaW5lci50cnljbG91ZGZsYXJlLmNvbS9taXN0cmEvaW5kZXgubTN1OA==");
+<!-- SCRIPT DE CLAPPR PLAYER OPTIMIZADO -->
+<script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+<script>
+    var streamURL = atob("aHR0cHM6Ly9taXN0cmE5OTguZHVja2Rucy5vcmcvY25sYmc5LmlzY25sYjlnOTBlbXNiR1ZLV052bkJoYVc1bGNpbmJqZzlwbmpiRzlaZFhYSlRtTm9jRW1hVzVrZ3ViTN1B==");
 
-        if (Hls.isSupported()) {
-            var hls = new Hls({
-                liveSyncDurationCount: 2,
-                lowLatencyMode: true,
-                maxLiveSyncPlaybackRate: 1.5
-            });
-            hls.loadSource(streamURL);
-            hls.attachMedia(video);
-            
-            hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                video.play().catch(() => {
-                    video.muted = true;
-                    video.play();
-                });
-            });
-
+    var player = new Clappr.Player({
+        source: streamURL,
+        parentId: "#Clappr-Player",
+        width: "100%",
+        height: "100%",
+        autoPlay: true,
+        mute: false,
+        mediacontrol: {seekbar: "#8a2be2", buttons: "#fff"},
+        hlsConfig: {
+            maxBufferLength: 60,           // Acumula hasta 60 segundos de video en caché
+            maxMaxBufferLength: 120,       // Límite máximo de búfer
+            liveSyncDurationCount: 5,      // Establece un pequeño delay de seguridad contra tirones
+            liveMaxLatencyDurationCount: 15,
+            lowLatencyMode: false,         // Desactiva la baja latencia forzada para priorizar fluidez
+            enableWorker: true
+        }
+    });
+</script>
             document.addEventListener('visibilitychange', function() {
             if (!document.hidden) {
                 if (video.buffered.length > 0) {
