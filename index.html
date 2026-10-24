@@ -87,9 +87,9 @@
 
        if (Hls.isSupported()) {
      var hls = new Hls({
-        liveSyncDurationCount: 2,       // Arranca lo más cerca posible del vivo
-        liveMaxLatencyDurationCount: 4, // Si se atrasa mucho, salta automáticamente al vivo
-        maxLiveSyncPlaybackRate: 1.5    // Si se atrasa un poquito, acelera el video sutilmente para alcanzar el vivo sin cortes
+        liveSyncDurationCount: 4,       // Arranca lo más cerca posible del vivo
+        liveMaxLatencyDurationCount: 10, // Si se atrasa mucho, salta automáticamente al vivo
+        maxLiveSyncPlaybackRate: 1.2    // Si se atrasa un poquito, acelera el video sutilmente para alcanzar el vivo sin cortes
     });
             });
         }
