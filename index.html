@@ -67,7 +67,7 @@
     }
     </style>
     <!-- Llama al reproductor HLS.js directo de internet -->
-    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
 </head>
 <body>
     <style> body { padding-top: 36px; box-sizing: border-box; height: 100vh; margin: 0; overflow: hidden; } </style>
@@ -85,45 +85,49 @@
         <iframe src="https://www.twitch.tv/embed/mistra887/chat?parent=mistra998.github.io&darkpopout" frameborder="0"></iframe>
     </div>
 
-    
-    <!-- SCRIPT DEL REPRODUCTOR CLAPPR -->
-    <!--  Video.js -->
+<!-- Librerías de HLS.js y Plyr -->
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.polyfilled.js"></script>
+
 <script>
     var video = document.getElementById('mistra-player');
-    var streamURL = atob("aHR0cHM6Ly9nbm9tZS1ldmFsdWF0ZS1jb250cm9sbGVkLWNvbnRhaW5lci50cnljbG91ZGZsYXJlLmNvbS9taXN0cmEvaW5kZXgubTN1OA");
+    var streamURL = atob("aHR0cHM6Ly9nbm9tZS1ldmFsdWF0ZS1jb250cm9sbGVkLWNvbnRhaW5lci50cnljbG91ZGZsYXJlLmNvbS9taXN0cmEvaW5kZXgubTN1OA==");
 
     if (Hls.isSupported()) {
         var hls = new Hls({
-            liveSyncDurationCount: 2, // Mantiene el streaming pegado al directo (sin delay acumulado)
-            lowLatencyMode: true,     // Modo de baja latencia activado
+            liveSyncDurationCount: 2,
+            lowLatencyMode: true,
             maxLiveSyncPlaybackRate: 1.5
         });
         hls.loadSource(streamURL);
         hls.attachMedia(video);
+        
         hls.on(Hls.Events.MANIFEST_PARSED, function() {
             video.play().catch(() => {
-                // Si el navegador bloquea el autoplay con sonido, reproduce mudo o espera interacción
                 video.muted = true;
                 video.play();
             });
         });
+
+        // Inicializamos Plyr sobre el video apenas carga el stream
+        hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+            const player = new Plyr(video, {
+                controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'pip', 'fullscreen'],
+                live: true
+            });
+        });
         
-        // Manejo de errores y reconexión automática limpia
+        // Manejo de errores y reconexión automática con cuenta regresiva
         hls.on(Hls.Events.ERROR, function(event, data) {
             if (data.fatal) {
                 switch(data.type) {
                     case Hls.ErrorTypes.NETWORK_ERROR:
-                        console.log("Error de red, reconectando hls.js...");
                         hls.startLoad();
                         break;
                     case Hls.ErrorTypes.MEDIA_ERROR:
-                        console.log("Error de medios, recuperando...");
                         hls.recoverMediaError();
                         break;
-                   default:
-                        // Si el error es irrecuperable, destruimos la instancia y disparamos el cartel
-                        console.log("Stream caído de verdad.");
+                    default:
                         hls.destroy();
                         
                         let overlay = document.getElementById('reconnect-overlay');
@@ -150,7 +154,7 @@
                             if (segundos <= 0) {
                                 clearInterval(timer);
                                 if (overlay) overlay.remove();
-                                location.reload(); // Recarga limpia de la página para reenganchar el stream
+                                location.reload();
                             }
                         }, 1000);
                         break;
@@ -168,7 +172,6 @@
         if(e.keyCode == 123) { return false; }
         if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { return false; }
         if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { return false; }
-        if(e.ctrlKey && e.keyCode == 'Y'.charCodeAt(0)) { return false; }
         if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; }
     }
 </script>
