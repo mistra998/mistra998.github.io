@@ -85,11 +85,11 @@
         }
         /* Contenedor principal de la transmisión y el chat */
         .main-container {
-            display: flex;
-            width: 100%;
-            height: calc(100vh - 36px);
-            margin-top: 36px;
-        }
+    display: flex;
+    width: 100%;
+    height: calc(100vh - 36px); /* Ocupa toda la pantalla menos la barra superior */
+    margin-top: 36px;           /* Deja espacio para que no lo tape la barra fija */
+}
         .video-container {
             flex: 1;
             height: 100%;
@@ -317,6 +317,16 @@
             viewerSpan.innerText = count > 0 ? count : 1;
         }
     });
+
+    // Script para activar / desactivar el Modo Teatro
+const theaterBtn = document.getElementById('theater-btn');
+const mainContainer = document.querySelector('.main-container');
+
+if (theaterBtn && mainContainer) {
+    theaterBtn.addEventListener('click', () => {
+        mainContainer.classList.toggle('theater-mode');
+    });
+}
 </script>
 </body>
 </html>
