@@ -90,90 +90,91 @@
 
   <!-- CAJA DEL VIDEO -->
 <div class="video-container">
-    <video id="mistra-player" controls autoplay playsinline muted style="width: 100%; height: 100%; object-fit: contain; background: black;"></video>
+    <div id="mistra-player" style="width: 100%; height: 100%;"></div>
 </div>
     <!-- CAJA DEL CHAT -->
     <div class="chat-container">
         <iframe src="https://www.twitch.tv/embed/mistra887/chat?parent=mistra998.github.io&darkpopout" frameborder="0"></iframe>
     </div>
 
-<!-- Librerías de HLS.js y Plyr -->
+<!-- Librerías de HLS.js y Artplayer -->
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-<script src="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.polyfilled.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.js"></script>
 
 <script>
-    var video = document.getElementById('mistra-player');
-    var streamURL = atob("aHR0cHM6Ly9nbm9tZS1ldmFsdWF0ZS1jb250cm9sbGVkLWNvbnRhaW5lci50cnljbG91ZGZsYXJlLmNvbS9taXN0cmEvaW5kZXgubTN1OA==");
+    var streamURL = atob("TU_CADENA_BASE64_AQUI");
 
-    if (Hls.isSupported()) {
-        var hls = new Hls({
-            liveSyncDurationCount: 2,
-            lowLatencyMode: true,
-            maxLiveSyncPlaybackRate: 1.5
-        });
-        hls.loadSource(streamURL);
-        hls.attachMedia(video);
-        
-        hls.on(Hls.Events.MANIFEST_PARSED, function() {
-            video.play().catch(() => {
-                video.muted = true;
-                video.play();
-            });
-        });
-
-        // Inicializamos Plyr sobre el video apenas carga el stream
-        hls.on(Hls.Events.MEDIA_ATTACHED, function () {
-            const player = new Plyr(video, {
-                controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'pip', 'fullscreen'],
-                live: true
-            });
-        });
-        
-        // Manejo de errores y reconexión automática con cuenta regresiva
-        hls.on(Hls.Events.ERROR, function(event, data) {
-            if (data.fatal) {
-                switch(data.type) {
-                    case Hls.ErrorTypes.NETWORK_ERROR:
-                        hls.startLoad();
-                        break;
-                    case Hls.ErrorTypes.MEDIA_ERROR:
-                        hls.recoverMediaError();
-                        break;
-                    default:
-                        hls.destroy();
-                        
-                        let overlay = document.getElementById('reconnect-overlay');
-                        if (!overlay) {
-                            overlay = document.createElement('div');
-                            overlay.id = 'reconnect-overlay';
-                            overlay.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; font-family: sans-serif; text-align: center;';
-                            document.querySelector('.video-container').appendChild(overlay);
-                        }
-                        
-                        let segundos = 5;
-                        overlay.innerHTML = `
-                            <h3 style="margin: 0 0 10px 0; color: #ff4444; font-size: 22px;">⚠️ Señal caída temporalmente</h3>
-                            <p style="margin: 0; font-size: 16px;">Reconectando automáticamente en <span id="contador-seg" style="font-weight: bold; color: #00ffcc; font-size: 24px;">${segundos}</span> segundos...</p>
-                        `;
-                        
-                        let timer = setInterval(() => {
-                            segundos--;
-                            let contadorSpan = document.getElementById('contador-seg');
-                            if (contadorSpan) {
-                                contadorSpan.innerText = segundos;
-                            }
-                            
-                            if (segundos <= 0) {
-                                clearInterval(timer);
-                                if (overlay) overlay.remove();
-                                location.reload();
-                            }
-                        }, 1000);
-                        break;
+    var art = new Artplayer({
+        container: '#mistra-player',
+        url: streamURL,
+        type: 'm3u8',
+        customType: {
+            m3u8: function (video, url, art) {
+                if (Hls.isSupported()) {
+                    var hls = new Hls({
+                        liveSyncDurationCount: 2,
+                        lowLatencyMode: true
+                    });
+                    hls.loadSource(url);
+                    hls.attachMedia(video);
+                    art.hls = hls;
+                    
+                    hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                        art.play();
+                    });
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = url;
+                    video.addEventListener('loadedmetadata', function () {
+                        art.play();
+                    });
+                } else {
+                    art.notice.show('El navegador no soporta HLS');
                 }
+            },
+        },
+        volume: 0.7,
+        isLive: true,
+        muted: false,
+        autoplay: true,
+        aspectRatio: true,
+        fullscreen: true,
+        miniProgressBar: true,
+        airplay: true,
+        setting: true,
+        cssVar: {
+            --primary: '#00ffcc',
+        },
+    });
+
+    // Manejo de errores para tu cuenta regresiva si se cae el stream
+    art.on('error', (error, reconnectInterval) => {
+        console.log("Stream caído, activando reconexión...");
+        let overlay = document.getElementById('reconnect-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'reconnect-overlay';
+            overlay.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; font-family: sans-serif; text-align: center;';
+            document.querySelector('.video-container').appendChild(overlay);
+        }
+        
+        let segundos = 5;
+        overlay.innerHTML = `
+            <h3 style="margin: 0 0 10px 0; color: #ff4444; font-size: 22px;">⚠️ Señal caída temporalmente</h3>
+            <p style="margin: 0; font-size: 16px;">Reconectando automáticamente en <span id="contador-seg" style="font-weight: bold; color: #00ffcc; font-size: 24px;">${segundos}</span> segundos...</p>
+        `;
+        
+        let timer = setInterval(() => {
+            segundos--;
+            let contadorSpan = document.getElementById('contador-seg');
+            if (contadorSpan) contadorSpan.innerText = segundos;
+            
+            if (segundos <= 0) {
+                clearInterval(timer);
+                if (overlay) overlay.remove();
+                location.reload();
             }
-        });
-    }
+        }, 1000);
+    });
 </script>
 
 <!-- Seguridad: Bloquear clic derecho y F12 -->
