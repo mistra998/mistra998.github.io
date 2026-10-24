@@ -47,12 +47,18 @@
             border: none;
         }
        @media screen and (max-width: 768px) {
-    .video-container video, 
-    .plyr {
-        object-fit: cover !important; /* Esto hace que la imagen se estire/haga zoom para llenar el cuadro */
+    .video-container {
+        width: 100% !important;
+        height: 32vh !important; /* Ajusta la altura del reproductor en el celu */
+        background: #000 !important;
+    }
+    /* F*/
+    .plyr, .plyr__video-wrapper, .plyr video {
         width: 100% !important;
         height: 100% !important;
+        object-fit: cover !important; 
     }
+}
         }
         .chat-container {
             width: 100% !important;
