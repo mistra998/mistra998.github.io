@@ -67,7 +67,7 @@
     }
     </style>
     <!-- Llama al reproductor HLS.js directo de internet -->
-    <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
 </head>
 <body>
     <style> body { padding-top: 36px; box-sizing: border-box; height: 100vh; margin: 0; overflow: hidden; } </style>
@@ -78,9 +78,10 @@
 
   <!-- CAJA DEL VIDEO -->
 <div class="video-container">
-    <div id="player" style="width: 100%; height: 100%;"></div>
+    <video-js id="mistra-player" class="vjs-big-play-centered vjs-fluid" controls preload="auto" data-setup='{"liveui": true, "responsive": true}'>
+        <source src="" type="application/x-mpegURL">
+    </video-js>
 </div>
-
     <!-- CAJA DEL CHAT -->
     <div class="chat-container">
         <iframe src="https://www.twitch.tv/embed/mistra887/chat?parent=mistra998.github.io&darkpopout" frameborder="0"></iframe>
@@ -88,46 +89,39 @@
 
     
     <!-- SCRIPT DEL REPRODUCTOR CLAPPR -->
+    <!--  Video.js -->
+<script src="https://vjs.zencdn.net/8.10.0/video.js"></script>
+
     <script>
-        // Tu link de MediaMTX saliendo por Cloudflare
-        var streamURL = atob("aHR0cHM6Ly9nbm9tZS1ldmFsdWF0ZS1jb250cm9sbGVkLWNvbnRhaW5lci50cnljbG91ZGZsYXJlLmNvbS9taXN0cmEvaW5kZXgubTN1OA");
+    // 
+    var streamURL = atob("aHR0cHM6Ly9nbm9tZS1ldmFsdWF0ZS1jb250cm9sbGVkLWNvbnRhaW5lci50cnljbG91ZGZsYXJlLmNvbS9taXN0cmEvaW5kZXgubTN1OA==");
 
-        var player = new Clappr.Player({
-            source: streamURL,
-            parentId: "#player",
-            autoPlay: true,
-            mute: true,
-            width: '100%',
-            height: '100%',
-            poster: "poster.jpg",
-            playback: {
-                hlsjsConfig: {
-                    liveSyncDurationCount: 5,
-                    liveMaxLatencyDurationCount: 10, 
-                    maxBufferLength: 20
-                }
-            }
-        });
+    var player = videojs('mistra-player');
+    player.src({
+        src: streamURL,
+        type: 'application/x-mpegURL'
+    });
+    player.play();
+</script>
 
-        player.on(Clappr.Events.PLAYER_ERROR, function() {
-    console.log("Stream caído, iniciando cuenta regresiva...");
-    
-    // Crear o buscar el cartel de reconexión sobre el reproductor
-    let overlay = document.getElementById('reconnect-overlay');
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'reconnect-overlay';
-        overlay.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; font-family: sans-serif; text-align: center;';
-        document.getElementById('player').appendChild(overlay);
-    }
-    
-    let segundos = 5;
+        player.on('error', function() {
+        console.log("Stream caído, iniciando cuenta regresiva...");
+        
+        // Crear o buscar el cartel de reconexión sobre el reproductor
+        let overlay = document.getElementById('reconnect-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'reconnect-overlay';
+            overlay.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; font-family: sans-serif; text-align: center;';
+            document.querySelector('.video-container').appendChild(overlay);
+        }
+        
+       let segundos = 5; // <-- ¡Tiene que estar acá adentro!
     overlay.innerHTML = `
         <h3 style="margin: 0 0 10px 0; color: #ff4444; font-size: 22px;">⚠️ Señal caída temporalmente</h3>
         <p style="margin: 0; font-size: 16px;">Reconectando automáticamente en <span id="contador-seg" style="font-weight: bold; color: #00ffcc; font-size: 24px;">${segundos}</span> segundos...</p>
     `;
     
-    // Cuenta regresiva cada 1 segundo
     let timer = setInterval(() => {
         segundos--;
         let contadorSpan = document.getElementById('contador-seg');
@@ -135,33 +129,34 @@
             contadorSpan.innerText = segundos;
         }
         
-        // Cuando llega a 0, borramos el cartel y reintentamos cargar el stream
         if (segundos <= 0) {
             clearInterval(timer);
             if (overlay) overlay.remove();
-            player.configure({source: streamURL});
+            player.src({ src: streamURL, type: 'application/x-mpegURL' });
+            player.load();
+            player.play();
         }
     }, 1000);
 });
     </script>
 
+    <!-- Seguridad: Bloquear clic derecho y F12 -->
     <script>
-        // Bloquear clic derecho
         document.addEventListener('contextmenu', event => event.preventDefault());
-        
-        // Bloquear F12, Ctrl+Shift+I, Ctrl+Shift+J y Ctrl+U
+
         document.onkeydown = function(e) {
-            if(e.keyCode == 123) { return false; } 
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { return false; } 
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { return false; } 
-            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; } 
+            if(e.keyCode == 123) { return false; }
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { return false; }
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { return false; }
+            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; }
         }
     </script>
 
-   <script>
-  if ('serviceWorker' in navigator) {
+    <!-- Registro de la PWA (Service Worker) -->
+    <script>
+     if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js');
-  }
-</script>
+}
+    </script>
 </body>
 </html>
