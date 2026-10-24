@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stream en Vivo - Mistra998</title>
+    <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
     <style>
         /* Usamos flexbox en el body para dividir la pantalla */
         body, html { 
@@ -155,5 +157,11 @@
             if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; } 
         }
     </script>
+
+   <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
+</script>
 </body>
 </html>
