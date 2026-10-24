@@ -10,6 +10,31 @@
     <meta name="theme-color" content="#121212">
 
     <style>
+        /* Estilo del botón Modo Teatro */
+        #theater-btn {
+            background-color: #2a2a2e;
+            color: #ffffff;
+            border: 1px solid #3f3f46;
+            padding: 5px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        #theater-btn:hover {
+            background-color: #3f3f46;
+    
+        }
+
+        /* Lógica del Modo Teatro */
+        .main-container.theater-mode .chat-container {
+            display: none !important;
+        }
+        .main-container.theater-mode .video-container {
+            width: 100% !important;
+        }
         * {
             box-sizing: border-box;
             margin: 0;
@@ -35,6 +60,7 @@
             z-index: 999;
             display: flex;
             align-items: center;
+            justify-content: space-between;
         }
         .top-bar img {
             height: 28px;
@@ -109,6 +135,12 @@
         </div>
     </div>
 
+    <!-- BARRA SUPERIOR -->
+<div class="top-bar">
+    <img src="logo.png" alt="Mistra998">
+    <button id="theater-btn">Modo Teatro</button>
+</div>
+
     <!-- SCRIPT DE HLS.JS (Directo, sin tirones y ultrarrápido) -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
@@ -130,6 +162,18 @@
                     video.play();
                 });
             });
+
+            document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                if (video.buffered.length > 0) {
+                    var liveEdge = video.buffered.end(video.buffered.length - 1);
+                    if (liveEdge - video.currentTime > 3) {
+                        console.log("Sincronizando con el directo...");
+                        video.currentTime = liveEdge;
+                    }
+                }
+            }
+        });
 
             // Manejo de errores y cuenta regresiva automática si cae la señal
             hls.on(Hls.Events.ERROR, function(event, data) {
@@ -200,5 +244,17 @@
       }
     </script>
 
+    // Control del Botón Modo Teatro
+    const theaterBtn = document.getElementById('theater-btn');
+    const mainContainer = document.querySelector('.main-container');
+
+    theaterBtn.addEventListener('click', function() {
+        mainContainer.classList.toggle('theater-mode');
+        if (mainContainer.classList.contains('theater-mode')) {
+            theaterBtn.innerText = 'Mostrar Chat';
+        } else {
+            theaterBtn.innerText = 'Modo Teatro';
+        }
+    });
 </body>
 </html>
