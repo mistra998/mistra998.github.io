@@ -46,15 +46,13 @@
             height: 100%;
             border: none;
         }
-        @media screen and (max-width: 768px) {
-        body { 
-            display: flex;
-            flex-direction: column !important; 
-        }
-        video {
-            width: 100% !important;
-            height: 35vh !important;
-            object-fit: contain;
+       @media screen and (max-width: 768px) {
+    .video-container video, 
+    .plyr {
+        object-fit: cover !important; /* Esto hace que la imagen se estire/haga zoom para llenar el cuadro */
+        width: 100% !important;
+        height: 100% !important;
+    }
         }
         .chat-container {
             width: 100% !important;
