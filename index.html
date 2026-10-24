@@ -42,6 +42,25 @@
             height: 100%;
             border: none;
         }
+        @media screen and (max-width: 768px) {
+        body { 
+            display: flex;
+            flex-direction: column !important; 
+        }
+        video {
+            width: 100% !important;
+            height: 35vh !important;
+            object-fit: contain;
+        }
+        .chat-container {
+            width: 100% !important;
+            height: 65vh !important;
+        }
+        .chat-container iframe {
+            width: 100% !important;
+            height: 100% !important;
+        }
+    }
     </style>
     <!-- Llama al reproductor HLS.js directo de internet -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
