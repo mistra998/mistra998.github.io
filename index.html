@@ -86,11 +86,12 @@
         // Tu link de MediaMTX saliendo por Cloudflare
         var streamURL = "https://basis-priorities-reprint-arthritis.trycloudflare.com/mistra/index.m3u8";
 
-        if (Hls.isSupported()) {
-            var hls = new Hls({
-                liveSyncDurationCount: 4,       
-                liveMaxLatencyDurationCount: 10, 
-                maxLiveSyncPlaybackRate: 1.2    
+        if var hls = new Hls({
+            liveSyncDurationCount: 8,       // Arranca más atrás para tener un gran colchón de video
+            liveMaxLatencyDurationCount: 20, // Le da muchísimo margen antes de desesperarse
+            maxLiveSyncPlaybackRate: 1.1,   // Acelera muy suavemente si se atrasa
+            maxBufferLength: 30             // Obliga al navegador a guardar hasta 30 seg de video en memoria
+        });
             });
             hls.loadSource(streamURL);
             hls.attachMedia(video);
