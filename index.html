@@ -1,200 +1,204 @@
 <!DOCTYPE html>
 <html lang="es">
-<link rel="icon" type="image/jpeg" href="favicon.jpg">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stream en Vivo - Mistra998</title>
+    <title>Mistra998 - Live Stream</title>
+    
+    <!-- Configuración PWA -->
     <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#121212">
+
     <style>
-        /* Usamos flexbox en el body para dividir la pantalla */
-        body, html { 
-            margin: 0; 
-            padding: 0; 
-            width: 100%; 
-            height: 100%; 
-            background-color: black; 
-            overflow: hidden; 
-            display: flex; 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
-        
-        /* El contenedor del video ocupa todo el espacio izquierdo */
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: #121212;
+            overflow: hidden;
+            font-family: sans-serif;
+        }
+        /* Barra superior */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 36px;
+            background-color: #121212;
+            padding: 4px 15px;
+            border-bottom: 2px solid #8a2be2;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+        }
+        .top-bar img {
+            height: 28px;
+            display: block;
+        }
+        /* Contenedor principal de la transmisión y el chat */
+        .main-container {
+            display: flex;
+            width: 100%;
+            height: calc(100vh - 36px);
+            margin-top: 36px;
+        }
         .video-container {
             flex: 1;
+            height: 100%;
+            background: #000;
+            position: relative;
             display: flex;
             justify-content: center;
             align-items: center;
         }
-
-        /* Tu video se adapta a su contenedor */
-        video { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: contain; 
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: black;
         }
-
-        /* El contenedor del chat clavado a la derecha */
         .chat-container {
-            width: 350px; 
-            border-left: 1px solid #333;
+            width: 380px;
+            height: 100%;
+            background: #18181b;
+            border-left: 1px solid #2f2f35;
         }
-
-        /* El chat ocupa todo su cuadradito */
-        iframe {
+        .chat-container iframe {
             width: 100%;
             height: 100%;
             border: none;
         }
-       @media screen and (max-width: 768px) {
-    body {
-        display: flex !important;
-        flex-direction: column !important; /* Fuerza a que el video esté arriba y el chat abajo */
-    }
-    .video-container {
-        width: 100% !important;
-        height: 35vh !important; /* Altura ideal para el reproductor en el celular */
-        background: #000 !important;
-    }
-    .chat-container {
-        width: 100% !important;
-        height: 65vh !important; /* El espacio restante para el chat */
-    }
-    /* Asegura que Plyr y el video cubran su caja sin deformarse */
-    .plyr, .plyr__video-wrapper, .plyr video {
-        width: 100% !important;
-        height: 100% !important;
-        object-fit: contain !important; 
-    }
-}
+
+        /* Diseño adaptable para celulares */
+        @media screen and (max-width: 768px) {
+            .main-container {
+                flex-direction: column !important;
+            }
+            .video-container {
+                width: 100% !important;
+                height: 35vh !important;
+                flex: none !important;
+            }
+            .chat-container {
+                width: 100% !important;
+                height: 65vh !important;
+                flex: none !important;
+            }
         }
-        .chat-container {
-            width: 100% !important;
-            height: 65vh !important;
-        }
-        .chat-container iframe {
-            width: 100% !important;
-            height: 100% !important;
-        }
-    }
     </style>
-    <!-- Llama al reproductor HLS.js directo de internet -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
 </head>
 <body>
-    <style> body { padding-top: 36px; box-sizing: border-box; height: 100vh; margin: 0; overflow: hidden; } </style>
-    <!-- BARRA SUPERIOR CON LOGO ESTATICO -->
-    <div style="position: absolute; top: 0; left: 0; width: 100%; background-color: #121212; padding: 5px 15px; box-sizing: border-box; border-bottom: 2px solid #8a2be2; z-index: 999;">
-        <img src="logo.png" alt="Mistra998" style="height: 28px; display: block;">
+
+    <!-- BARRA SUPERIOR -->
+    <div class="top-bar">
+        <img src="logo.png" alt="Mistra998">
     </div>
 
-  <!-- CAJA DEL VIDEO -->
-<div class="video-container">
-    <div id="mistra-player" style="width: 100%; height: 100%;"></div>
-</div>
-    <!-- CAJA DEL CHAT -->
-    <div class="chat-container">
-        <iframe src="https://www.twitch.tv/embed/mistra887/chat?parent=mistra998.github.io&darkpopout" frameborder="0"></iframe>
+    <!-- CONTENEDOR DE VIDEO Y CHAT -->
+    <div class="main-container">
+        <div class="video-container">
+            <video id="mistra-player" controls autoplay playsinline muted></video>
+        </div>
+        <div class="chat-container">
+            <iframe src="https://www.twitch.tv/embed/mistra887/chat?parent=mistra998.github.io&darkpopout"></iframe>
+        </div>
     </div>
 
-<!-- Librerías de HLS.js y Artplayer -->
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-<script src="https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.js"></script>
+    <!-- SCRIPT DE HLS.JS (Directo, sin tirones y ultrarrápido) -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script>
+        var video = document.getElementById('mistra-player');
+        var streamURL = atob("aHR0cHM6Ly9nbm9tZS1ldmFsdWF0ZS1jb250cm9sbGVkLWNvbnRhaW5lci50cnljbG91ZGZsYXJlLmNvbS9taXN0cmEvaW5kZXgubTN1OA==");
 
-<script>
-    var streamURL = atob("aHR0cHM6Ly9nbm9tZS1ldmFsdWF0ZS1jb250cm9sbGVkLWNvbnRhaW5lci50cnljbG91ZGZsYXJlLmNvbS9taXN0cmEvaW5kZXgubTN1OA");
-
-    var art = new Artplayer({
-        container: '#mistra-player',
-        url: streamURL,
-        type: 'm3u8',
-        customType: {
-            m3u8: function (video, url, art) {
-                if (Hls.isSupported()) {
-                    var hls = new Hls({
-                        liveSyncDurationCount: 2,
-                        lowLatencyMode: true
-                    });
-                    hls.loadSource(url);
-                    hls.attachMedia(video);
-                    art.hls = hls;
-                    
-                    hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                        art.play();
-                    });
-                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                    video.src = url;
-                    video.addEventListener('loadedmetadata', function () {
-                        art.play();
-                    });
-                } else {
-                    art.notice.show('El navegador no soporta HLS');
-                }
-            },
-        },
-        volume: 0.7,
-        isLive: true,
-        muted: false,
-        autoplay: true,
-        aspectRatio: true,
-        fullscreen: true,
-        miniProgressBar: true,
-        airplay: true,
-        setting: true,
-        cssVar: {
-            --primary: '#00ffcc',
-        },
-    });
-
-    // Manejo de errores para tu cuenta regresiva si se cae el stream
-    art.on('error', (error, reconnectInterval) => {
-        console.log("Stream caído, activando reconexión...");
-        let overlay = document.getElementById('reconnect-overlay');
-        if (!overlay) {
-            overlay = document.createElement('div');
-            overlay.id = 'reconnect-overlay';
-            overlay.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; font-family: sans-serif; text-align: center;';
-            document.querySelector('.video-container').appendChild(overlay);
-        }
-        
-        let segundos = 5;
-        overlay.innerHTML = `
-            <h3 style="margin: 0 0 10px 0; color: #ff4444; font-size: 22px;">⚠️ Señal caída temporalmente</h3>
-            <p style="margin: 0; font-size: 16px;">Reconectando automáticamente en <span id="contador-seg" style="font-weight: bold; color: #00ffcc; font-size: 24px;">${segundos}</span> segundos...</p>
-        `;
-        
-        let timer = setInterval(() => {
-            segundos--;
-            let contadorSpan = document.getElementById('contador-seg');
-            if (contadorSpan) contadorSpan.innerText = segundos;
+        if (Hls.isSupported()) {
+            var hls = new Hls({
+                liveSyncDurationCount: 2,
+                lowLatencyMode: true,
+                maxLiveSyncPlaybackRate: 1.5
+            });
+            hls.loadSource(streamURL);
+            hls.attachMedia(video);
             
-            if (segundos <= 0) {
-                clearInterval(timer);
-                if (overlay) overlay.remove();
-                location.reload();
-            }
-        }, 1000);
-    });
-</script>
+            hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                video.play().catch(() => {
+                    video.muted = true;
+                    video.play();
+                });
+            });
 
-<!-- Seguridad: Bloquear clic derecho y F12 -->
-<script>
-    document.addEventListener('contextmenu', event => event.preventDefault());
+            // Manejo de errores y cuenta regresiva automática si cae la señal
+            hls.on(Hls.Events.ERROR, function(event, data) {
+                if (data.fatal) {
+                    switch(data.type) {
+                        case Hls.ErrorTypes.NETWORK_ERROR:
+                            hls.startLoad();
+                            break;
+                        case Hls.ErrorTypes.MEDIA_ERROR:
+                            hls.recoverMediaError();
+                            break;
+                        default:
+                            hls.destroy();
+                            
+                            let overlay = document.getElementById('reconnect-overlay');
+                            if (!overlay) {
+                                overlay = document.createElement('div');
+                                overlay.id = 'reconnect-overlay';
+                                overlay.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; font-family: sans-serif; text-align: center;';
+                                document.querySelector('.video-container').appendChild(overlay);
+                            }
+                            
+                            let segundos = 5;
+                            overlay.innerHTML = `
+                                <h3 style="margin: 0 0 10px 0; color: #ff4444; font-size: 22px;">⚠️ Señal caída temporalmente</h3>
+                                <p style="margin: 0; font-size: 16px;">Reconectando automáticamente en <span id="contador-seg" style="font-weight: bold; color: #00ffcc; font-size: 24px;">${segundos}</span> segundos...</p>
+                            `;
+                            
+                            let timer = setInterval(() => {
+                                segundos--;
+                                let contadorSpan = document.getElementById('contador-seg');
+                                if (contadorSpan) contadorSpan.innerText = segundos;
+                                
+                                if (segundos <= 0) {
+                                    clearInterval(timer);
+                                    if (overlay) overlay.remove();
+                                    location.reload();
+                                }
+                            }, 1000);
+                            break;
+                    }
+                }
+            });
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = streamURL;
+            video.addEventListener('loadedmetadata', function() {
+                video.play();
+            });
+        }
+    </script>
 
-    document.onkeydown = function(e) {
-        if(e.keyCode == 123) { return false; }
-        if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { return false; }
-        if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { return false; }
-        if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; }
-    }
-</script>
+    <!-- Seguridad: Bloquear clic derecho y F12 -->
+    <script>
+        document.addEventListener('contextmenu', event => event.preventDefault());
 
-<!-- Registro de la PWA (Service Worker) -->
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-  }
-</script>
+        document.onkeydown = function(e) {
+            if(e.keyCode == 123) { return false; }
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { return false; }
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { return false; }
+            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; }
+        }
+    </script>
+
+    <!-- Registro de la PWA (Service Worker) -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js');
+      }
+    </script>
 
 </body>
 </html>
