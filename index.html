@@ -47,16 +47,24 @@
             border: none;
         }
        @media screen and (max-width: 768px) {
+    body {
+        display: flex !important;
+        flex-direction: column !important; /* Fuerza a que el video esté arriba y el chat abajo */
+    }
     .video-container {
         width: 100% !important;
-        height: 32vh !important; /* Ajusta la altura del reproductor en el celu */
+        height: 35vh !important; /* Altura ideal para el reproductor en el celular */
         background: #000 !important;
     }
-    /* F*/
+    .chat-container {
+        width: 100% !important;
+        height: 65vh !important; /* El espacio restante para el chat */
+    }
+    /* Asegura que Plyr y el video cubran su caja sin deformarse */
     .plyr, .plyr__video-wrapper, .plyr video {
         width: 100% !important;
         height: 100% !important;
-        object-fit: cover !important; 
+        object-fit: contain !important; 
     }
 }
         }
